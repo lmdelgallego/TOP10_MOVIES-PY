@@ -30,6 +30,11 @@ class Movie(db.Model):
         return f'<Book {self.title}>'
 
 
+class EditForm(FlaskForm):
+    rating = StringField("Your Rating Out of 10 e.g. 7.5", validators=[DataRequired()])
+    review = StringField("Your Review", validators=[DataRequired()])
+    submit = SubmitField("Done")
+
 with app.app_context():
     db.create_all()
     # new_movie = Movie(
@@ -49,6 +54,18 @@ with app.app_context():
 def home():
     all_movies = Movie.query.all()
     return render_template("index.html", movies=all_movies)
+
+@app.route("/update", methods=["GET", "POST"])
+def update():
+    form = EditForm()
+    movie_id = request.args.get("id")
+    movie = Movie.query.get(movie_id)
+    if form.validate_on_submit():
+        movie.rating = float(form.rating.data)
+        movie.review = form.review.data
+        db.session.commit()
+        return redirect(url_for("home"))
+    return render_template("edit.html", movie=movie, form=form)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,8 @@ from wtforms.validators import DataRequired
 import requests
 
 MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
+MOVIE_DB_DETAILS_MOVIE = "https://api.themoviedb.org/3/movie/"
+MOVIE_DB_IMAGE_URL= "https://image.tmdb.org/t/p/original"
 MOVIE_DB_API_KEY = os.environ.get("API_KEY")  # your API key here
 
 app = Flask(__name__)
@@ -96,9 +98,25 @@ def add():
 
     return render_template("add.html", form=form)
 
-@app.route('/edit')
-def edit():
-    pass
+@app.route('/find')
+def find():
+    movie_api_id = request.args.get("id")
+    if movie_api_id:
+        movie_api_id = f"{MOVIE_DB_DETAILS_MOVIE}/{movie_api_id}"
+        response = requests.get(movie_api_id, params={"api_key": MOVIE_DB_API_KEY, "language": "en-US"})
+        data = response.json()
+        new_movie = Movie(
+            title=data["title"],
+            year=data["release_date"].split("-")[0],
+            img_url= f"{MOVIE_DB_IMAGE_URL}{data['poster_path']}",
+            description=data["overview"],
+            rating=0.0,
+            ranking=1,
+            review="",
+        )
+        db.session.add(new_movie)
+        db.session.commit()
+        return redirect(url_for("home"))
 
 if __name__ == "__main__":
     app.run(debug=True)

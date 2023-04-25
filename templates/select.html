@@ -12,12 +12,17 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="heading">Select Movie</h1>
-  <p>
-    {% for movie in options %}
-      <a href="#"> {{movie.original_title}} - {{movie.release_date}}</a><br/>
-    {% endfor %}
-  </p>
-
+  <h1 class="heading">Select Movie</h1>
+  {% for movie in options %}
+  <a href="{{ url_for("edit", id=movie.id)}}" class='media movie-card'>
+    <div class='media-left'>
+        <img class="media-object image-media" src="https://image.tmdb.org/t/p/w92{{movie.poster_path}}" alt="{{movie.original_title}}">
+    </div>
+    <div class="media-body">
+      <h5 class="media-heading">{{movie.original_title}}</h5>
+      <p>{{movie.overview}}</p>
+    </div>
+  </a>
+  {% endfor %}
 </div>
 {% endblock %}

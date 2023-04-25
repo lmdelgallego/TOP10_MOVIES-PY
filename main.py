@@ -96,5 +96,9 @@ def add():
 
     return render_template("add.html", form=form)
 
+@app.route('/edit')
+def edit():
+    pass
+
 if __name__ == "__main__":
     app.run(debug=True)

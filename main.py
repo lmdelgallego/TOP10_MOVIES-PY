@@ -58,7 +58,10 @@ with app.app_context():
 
 @app.route("/")
 def home():
-    all_movies = Movie.query.all()
+    all_movies = Movie.query.order_by(Movie.rating).all()
+    for i in range(len(all_movies)):
+        all_movies[i].ranking = len(all_movies) - i
+    db.session.commit()
     return render_template("index.html", movies=all_movies)
 
 @app.route("/update", methods=["GET", "POST"])
@@ -117,6 +120,14 @@ def find():
         db.session.add(new_movie)
         db.session.commit()
         return redirect(url_for("home"))
+
+@app.route("/delete")
+def delete_movie():
+    movie_id = request.args.get("id")
+    movie = Movie.query.get(movie_id)
+    db.session.delete(movie)
+    db.session.commit()
+    return redirect(url_for("home"))
 
 if __name__ == "__main__":
     app.run(debug=True)
